@@ -372,8 +372,19 @@ def parse_panoptic_segmentation_2d_proto(annotation_file):
                 class_names.append(class_name)
                 instance_ids.append(instance_id)
     return instance_masks, class_names, instance_ids
+
 #-------------------------- Depth Annotations ----------------------------------------#
 
+
+def load_depth_map(filename):
+    depth_map = np.load(filename)
+    return depth_map
+    
+def load_depth_annotations(annotations, annotations_dir, name_to_contiguous_id):
+    depth_map = load_depth_map(os.path.join(annotations_dir, annotations["depth"]))
+    return OrderedDict({
+        "depth_map": depth_map
+    })
 
 @diskcache(protocol='npz')
 def get_depth_from_point_cloud(

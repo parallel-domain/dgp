@@ -15,7 +15,8 @@ from dgp.datasets.annotations import (get_depth_from_point_cloud,
                                       load_bounding_box_2d_annotations,
                                       load_bounding_box_3d_annotations,
                                       load_panoptic_segmentation_2d_annotations,
-                                      load_semantic_segmentation_2d_annotations)
+                                      load_semantic_segmentation_2d_annotations,
+                                      load_depth_annotations)
 from dgp.datasets.base_dataset import (BaseSceneDataset, DatasetMetadata,
                                        _BaseDataset)
 from dgp.utils.geometry import Pose
@@ -357,6 +358,12 @@ class _SynchronizedDataset(_BaseDataset):
             )
             data.update(annotation_data)
 
+        if "depth" in self.requested_annotations and "depth" in annotations:
+            annotation_data = load_depth_annotations(
+                annotations, ann_root_dir, self.instance_name_to_contiguous_id
+            )
+            data.update(annotation_data)
+
         return data
 
     def get_point_cloud_from_datum(self, scene_idx, sample_idx_in_scene, datum_idx_in_sample):
@@ -474,6 +481,7 @@ class _SynchronizedDataset(_BaseDataset):
                 datum_data['depth'] = get_depth_from_point_cloud(
                     self, scene_idx, sample_idx_in_scene, datum_idx_in_sample, pc_datum_idx_in_sample
                 )
+            datum_data
             return datum_data
         elif datum_type == 'point_cloud':
             return self.get_point_cloud_from_datum(scene_idx, sample_idx_in_scene, datum_idx_in_sample)
